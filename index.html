@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Amazon Lucky Draw</h1>
+        <p>try your chance to win cash prize!</p>
+        <p id="spinLimit">Tries Remaining</p>
+        <div class="balance-section">
+            <div class="balance">
+                <p>Your current balance:</p>
+                <div class="balance-item">
+                    <span id="coinBalance">0</span>
+                    <img src="coin.png" alt="coins" class="icon coin">
+                </div>
+                <div class="balance-item">
+                    <span id="diamondBalance">0</span>
+                    <img src="blue.png" alt="diamonds" class="icon diamond">
+                </div>
+                <div class="balance-item">
+                    <span id="redDiamondBalance">0</span>
+                    <img src="red.png" alt="red diamonds" class="icon red-diamond">
+                </div>
+                <div class="balance-item">
+                    <span id="greenDiamondBalance">0</span>
+                    <img src="green.png" alt="green diamonds" class="icon green-diamond">
+                </div>
+            </div>
+            <img id="spinnerImage" src="Draw.png" alt="Spinner Image" style="display: none;"> <!-- Add spinner image with display: none -->
+            
+            <div class="conversion-rates">
+                <p>Conversion Rates:</p>
+                <ul>
+                    <li>1000 coins = $51</li>
+                    <li>100 red diamonds = $110</li>
+                    <li>300 green diamonds = $70</li>
+                    <li>500 blue diamonds = $41</li>
+                </ul>
+            </div>
+        </div>
+        <div class="buttons">
+            <button id="spinButton">Draw</button>
+            <button id="adButton">Watch an Ad for Extra Draw</button>
+            <button id="buyButton">Claim Rewards</button>
+            
+        </div>
+        <div class="recent-rewards">
+            <p>Recent Rewards:</p>
+            <ul id="recentRewards"></ul>
+        </div>
+
+    </div>
+    <div id="spinner" class="spinner"> <img id="rewardImage" src="try.png" alt="Reward Image"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,151 +1,147 @@
-// Your JavaScript code remains unchanged
-let coinBalance = 0;
-let diamondBalance = 0;
-let redDiamondBalance = 0;
-let greenDiamondBalance = 0;
-let spinLimit = 5;
-let recentRewards = [];
+const API_URL = 'https://opentdb.com/api.php?amount=20&category=9';
 
-document.addEventListener("DOMContentLoaded", function() {
-    updateDashboard();
+const landingSection = document.getElementById('landing');
+const questionSection = document.getElementById('question');
+const questionElement = document.getElementById('question-text');
+const answerButtonsElement = document.getElementById('answer-buttons');
+const pointsElement = document.getElementById('points');
+const progressBarInner = document.getElementById('progress-bar-inner');
+const correctCounter = document.getElementById('correct-counter');
+const correctAnswersSpan = document.getElementById('correct-answers');
+const totalQuestionsSpan = document.getElementById('total-questions');
+const errorSection = document.getElementById('error');
+const loadingOverlay = document.getElementById('loading-overlay');
+let points = 0;
+let correctAnswersCount = 0;
+let totalQuestions = 21;
+let consecutiveCorrectAnswers = 0;
 
-    document.getElementById("spinButton").addEventListener("click", spinWheel);
-    document.getElementById("adButton").addEventListener("click", watchAd);
-    document.getElementById("buyButton").addEventListener("click", buySpin);
-});
+document.getElementById('start-game').addEventListener('click', startGame);
 
-function spinWheel() {
-    // Show spinner
-    document.getElementById("spinner").style.display = "block";
-    document.getElementById("spinnerImage").style.display = "block";
+async function startGame() {
+    landingSection.classList.add('hidden');
+    errorSection.classList.add('hidden');
+    questionSection.classList.remove('hidden');
+    await getTriviaQuestion();
+}
 
-    if (spinLimit > 0) {
-        spinLimit--;
-
-        // Simulate the spin and calculate rewards
-        let result = Math.floor(Math.random() * 100) + 1; // Generate a random number between 1 and 100
-        if (result === 1) { // 1% chance of getting a valuable reward
-            let diamondType = Math.floor(Math.random() * 10); // Generate a random number between 0 and 9
-            switch (diamondType) {
-                case 0:
-                case 1:
-                    addRedDiamonds(10); // Red diamond (2% chance)
-                    break;
-                case 2:
-                case 3:
-                case 4:
-                    addGreenDiamonds(30); // Green diamond (3% chance)
-                    break;
-                default:
-                    addDiamonds(100); // Normal diamond (5% chance)
-                    break;
-            }
-        } else {
-            addCoins(10);
+async function getTriviaQuestion() {
+    try {
+        showLoading();
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        if (data.response_code !== 0) {
+            throw new Error('Failed to fetch question. Please try again later.');
         }
+        const question = data.results[0];
+        totalQuestions--;
+        updateTotalQuestions();
+        displayQuestion(question);
+    } catch (error) {
+        console.error('Error fetching question:', error);
+        showError('Failed to fetch question. Please try again later.');
+    } finally {
+        hideLoading();
+    }
+}
 
-        // Update balances and display recent rewards
-        updateDashboard();
+function displayQuestion(question) {
+    questionElement.textContent = question.question;
+    const answers = [...question.incorrect_answers, question.correct_answer];
+    shuffleArray(answers);
+    answerButtonsElement.innerHTML = '';
+    answers.forEach(answer => {
+        const button = document.createElement('button');
+        button.innerText = answer;
+        button.classList.add('btn', 'btn-primary', 'mx-2', 'my-1');
+        button.addEventListener('click', () => checkAnswer(answer, question.correct_answer));
+        answerButtonsElement.appendChild(button);
+    });
+}
 
-        // Hide spinner after a short delay (simulating a server response)
-        setTimeout(function() {
-            document.getElementById("spinner").style.display = "none";
-            document.getElementById("spinnerImage").style.display = "none";
-        }, 1000); // Adjust the delay as needed
+function checkAnswer(selectedAnswer, correctAnswer) {
+    const correct = selectedAnswer === correctAnswer;
+    if (correct) {
+        points += 10;
+        pointsElement.textContent = `Points: ${points}`;
+        correctAnswersCount++;
+        consecutiveCorrectAnswers++;
+        updateCorrectCounter();
+        showAnswerMessage("Correct");
     } else {
-        alert("You have reached your spin limit for this hour.");
-
-        // Hide spinner if spin limit is reached
-        document.getElementById("spinner").style.display = "none";
-        document.getElementById("spinnerImage").style.display = "none";
+        consecutiveCorrectAnswers = 0;
+        showAnswerMessage("Wrong", correctAnswer);
     }
-}
-
-function watchAd() {
-    spinLimit++; // Add an extra spin
-    updateDashboard();
-}
-
-function buySpin() {
-    if (coinBalance >= 1000) {
-        coinBalance -= 1000; // Deduct 1000 coins
-        spinLimit++;
-        updateDashboard();
+    updateProgressBar();
+    if (correctAnswersCount >= 20) {
+        congratulate();
     } else {
-        alert("You don't have enough Money to claim.");
+        nextQuestion();
     }
 }
 
-function addCoins(amount) {
-    coinBalance += amount;
-    recentRewards.unshift(`You won ${amount} coins!`);
+async function nextQuestion() {
+    await sleep(3000);
+    await getTriviaQuestion();
 }
 
-// Other functions remain unchanged...
-
-function addDiamonds(amount) {
-    diamondBalance += amount;
-    recentRewards.unshift(`You won ${amount} normal diamonds!`);
+function updateProgressBar() {
+    const progressPercentage = ((21 - totalQuestions) / 20) * 100;
+    progressBarInner.style.width = `${progressPercentage}%`;
 }
 
-function addRedDiamonds(amount) {
-    redDiamondBalance += amount;
-    recentRewards.unshift(`You won ${amount} red diamonds!`);
+function updateCorrectCounter() {
+    const level = Math.ceil(correctAnswersCount / 5);
+    correctCounter.innerHTML = `<span class="level">Level ${level}:</span>`;
+    const levelBar = document.createElement('div');
+    levelBar.classList.add('level-bar');
+    levelBar.style.width = `${(consecutiveCorrectAnswers % 5) * 20}%`;
+    correctCounter.appendChild(levelBar);
 }
 
-function addGreenDiamonds(amount) {
-    greenDiamondBalance += amount;
-    recentRewards.unshift(`You won ${amount} green diamonds!`);
+function updateTotalQuestions() {
+    totalQuestionsSpan.textContent = `/ Questions Left: ${totalQuestions}`;
 }
 
-function updateDashboard() {
-    document.getElementById("coinBalance").textContent = coinBalance;
-    document.getElementById("diamondBalance").textContent = diamondBalance;
-    document.getElementById("redDiamondBalance").textContent = redDiamondBalance;
-    document.getElementById("greenDiamondBalance").textContent = greenDiamondBalance;
-    document.getElementById("spinLimit").textContent = spinLimit;
-
-    // Display recent rewards
-    let recentRewardsList = document.getElementById("recentRewards");
-    recentRewardsList.innerHTML = "";
-    for (let i = 0; i < recentRewards.length && i < 5; i++) {
-        let listItem = document.createElement("li");
-        listItem.textContent = recentRewards[i];
-        recentRewardsList.appendChild(listItem);
+function showAnswerMessage(message, correctAnswer) {
+    const messageElement = document.createElement('div');
+    if (message === "Wrong") {
+        messageElement.textContent = `${message}. The correct answer was: ${correctAnswer}`;
+    } else {
+        messageElement.textContent = message;
     }
-
-    // Check if user has reached conversion thresholds and convert to dollars
-    convertToDollars();
+    messageElement.classList.add('answer-message', message.toLowerCase());
+    document.getElementById('question').appendChild(messageElement);
+    setTimeout(() => {
+        messageElement.remove();
+    }, 3000);
 }
 
-function convertToDollars() {
-    let dollarsEarned = 0;
+function showError(errorMessage) {
+    errorSection.classList.remove('hidden');
+    document.getElementById('error-message').textContent = errorMessage;
+}
 
-    // Convert coins to dollars
-    if (coinBalance >= 1000) {
-        dollarsEarned += Math.floor(coinBalance / 1000);
-        coinBalance %= 1000;
-    }
+function congratulate() {
+    console.log("Congratulations! You've reached Level 2!");
+}
 
-    // Convert red diamonds to dollars
-    if (redDiamondBalance >= 100) {
-        dollarsEarned += Math.floor(redDiamondBalance / 100);
-        redDiamondBalance %= 100;
-    }
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    // Convert green diamonds to dollars
-    if (greenDiamondBalance >= 300) {
-        dollarsEarned += Math.floor(greenDiamondBalance / 300);
-        greenDiamondBalance %= 300;
-    }
+function showLoading() {
+    loadingOverlay.style.display = 'flex';
+}
 
-    // Convert normal diamonds to dollars
-    if (diamondBalance >= 500) {
-        dollarsEarned += Math.floor(diamondBalance / 500);
-        diamondBalance %= 500;
-    }
+function hideLoading() {
+    loadingOverlay.style.display = 'none';
+}
 
-    if (dollarsEarned > 0) {
-        alert(`Congratulations! You've earned $${dollarsEarned}`);
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
 }

@@ -3,60 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Dashboard</title>
+    <title>Reward-based Trivia Game</title>
+    <meta name="google-adsense-account" content="ca-pub-6781813253472276">
+    <link rel="icon" type="image/png" href="icon.png">
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Amazon Lucky Draw</h1>
-        <p>try your chance to win cash prize!</p>
-        <p id="spinLimit">Tries Remaining</p>
-        <div class="balance-section">
-            <div class="balance">
-                <p>Your current balance:</p>
-                <div class="balance-item">
-                    <span id="coinBalance">0</span>
-                    <img src="coin.png" alt="coins" class="icon coin">
+    <header>
+        <h1>Reward-based Trivia Game</h1>
+        <img src='https://www.google.com/s2/favicons?domain=Amazon.com'>
+        <p>by Amazon.com</p>
+    </header>
+    <main>
+        <section id="landing">
+            <h2>Welcome to the Trivia Game!</h2>
+            <p>have fun and win wonderful prices everytime you reach a new level!!</p>
+            <button id="start-game" class="btn btn-primary">Start Game</button>
+        </section>
+        <section id="question" class="hidden">
+            <div id="loading-overlay">
+                <div>Loading...</div>
+            </div>
+            <div class="question-container">
+                <h2>Question:</h2>
+                <p id="question-text"></p>
+                <div id="answer-buttons" class="mt-3"></div>
+            </div>
+            <div id="progress-stats" class="mt-3">
+                <span id="total-questions"><strong>/ Total Questions: 0</strong></span>
+            </div>
+            <div id="reward">
+                <h2>Reach Level 2 and get a great reward.</h2>
+                <p id="points">Points: 0</p>
+                <div id="progress-bar">
+                    <div id="progress-bar-inner"></div>
                 </div>
-                <div class="balance-item">
-                    <span id="diamondBalance">0</span>
-                    <img src="blue.png" alt="diamonds" class="icon diamond">
-                </div>
-                <div class="balance-item">
-                    <span id="redDiamondBalance">0</span>
-                    <img src="red.png" alt="red diamonds" class="icon red-diamond">
-                </div>
-                <div class="balance-item">
-                    <span id="greenDiamondBalance">0</span>
-                    <img src="green.png" alt="green diamonds" class="icon green-diamond">
+                <div id="correct-counter" class="mt-3">
+                    <span class="level">Level 1:</span>
+                    <div class="level-bar"></div>
                 </div>
             </div>
-            <img id="spinnerImage" src="Draw.png" alt="Spinner Image" style="display: none;"> <!-- Add spinner image with display: none -->
-            
-            <div class="conversion-rates">
-                <p>Conversion Rates:</p>
-                <ul>
-                    <li>1000 coins = $51</li>
-                    <li>100 red diamonds = $110</li>
-                    <li>300 green diamonds = $70</li>
-                    <li>500 blue diamonds = $41</li>
-                </ul>
-            </div>
-        </div>
-        <div class="buttons">
-            <button id="spinButton">Draw</button>
-            <button id="adButton">Watch an Ad for Extra Draw</button>
-            <button id="buyButton">Claim Rewards</button>
-            
-        </div>
-        <div class="recent-rewards">
-            <p>Recent Rewards:</p>
-            <ul id="recentRewards"></ul>
-        </div>
-
-    </div>
-    <div id="spinner" class="spinner"> <img id="rewardImage" src="try.png" alt="Reward Image"></div>
-
+        </section>
+        <section id="error" class="hidden">
+            <p id="error-message" class="hidden">An error occurred. Please try again later.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Reward-based Trivia Game</p>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>
